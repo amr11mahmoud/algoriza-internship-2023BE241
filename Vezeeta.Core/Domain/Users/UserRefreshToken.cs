@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Vezeeta.Core.Domain.User
+namespace Vezeeta.Core.Domain.Users
 {
     public class UserRefreshToken
     {

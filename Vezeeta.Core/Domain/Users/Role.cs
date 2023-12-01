@@ -5,9 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Vezeeta.Core.Domain.User
+namespace Vezeeta.Core.Domain.Users
 {
-    public class RoleClaim : IdentityRoleClaim<Guid>
+    public class Role:IdentityRole<Guid>
     {
+        public Role() { }
+        public Role(string name) : base(name)
+        {
+
+        }
     }
 }

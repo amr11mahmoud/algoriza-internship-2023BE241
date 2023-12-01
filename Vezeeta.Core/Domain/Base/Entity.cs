@@ -4,11 +4,6 @@
     {
         public virtual TId Id { get; protected set; }
 
-        protected Entity(TId id)
-        {
-            Id = id;
-        }
-
         public override bool Equals(object obj)
         {
             Entity<TId> entity = obj as Entity<TId>;

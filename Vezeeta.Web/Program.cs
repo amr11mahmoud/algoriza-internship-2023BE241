@@ -1,4 +1,3 @@
-
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -8,7 +7,11 @@ using Microsoft.OpenApi.Models;
 using Serilog;
 using System.Text;
 using Vezeeta.Core.Domain.User;
+using Vezeeta.Core.Repository;
+using Vezeeta.Core.Service.Users;
 using Vezeeta.Repository;
+using Vezeeta.Repository.Repositories;
+using Vezeeta.Service.Users;
 
 namespace Vezeeta.Web
 {
@@ -59,6 +62,7 @@ namespace Vezeeta.Web
                     b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName));
             }, 2048 /* pool size */ );
 
+
             builder.Services.AddIdentity<User, Role>(options =>
             {
                 options.Password.RequireNonAlphanumeric = true;
@@ -100,6 +104,10 @@ namespace Vezeeta.Web
 
             builder.Services.AddAutoMapper(typeof(MapperConfig));
 
+            builder.Services.AddTransient(typeof(IBaseRepository<>), typeof(BaseRepository<>));
+            builder.Services.AddTransient(typeof(IUserService), typeof(UserService));
+
+
             var app = builder.Build();
 
             app.UseSerilogRequestLogging();
@@ -130,5 +138,6 @@ namespace Vezeeta.Web
 
             app.Run();
         }
+
     }
 }

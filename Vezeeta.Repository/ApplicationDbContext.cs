@@ -1,8 +1,9 @@
 ﻿using Castle.Core.Resource;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Vezeeta.Core.Domain.Lookup;
-using Vezeeta.Core.Domain.User;
+using Vezeeta.Core.Domain.Users;
 
 namespace Vezeeta.Repository
 {
@@ -12,11 +13,13 @@ namespace Vezeeta.Repository
 
     public class ApplicationDbContext : IdentityDbContext<User, Role, Guid, UserClaim, UserRole, UserLogin, RoleClaim, UserToken>, IApplicationDbContext
     {
+
         public ApplicationDbContext(DbContextOptions options) : base(options)
         {
         }
-        public DbSet<UserRefreshToken> UserRefreshTokens { get; set; }
-        public DbSet<Specialization> Specializations { get; set; }
+
+        //public DbSet<UserRefreshToken> UserRefreshTokens { get; set; }
+        //public DbSet<Specialization> Specializations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -56,6 +59,27 @@ namespace Vezeeta.Repository
             {
                 entity.ToTable("UserTokens");
             });
+
+            builder.Entity<Role>().HasData(
+                new Role
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Admin",
+                    NormalizedName = "ADMIN",
+                    ConcurrencyStamp = Guid.NewGuid().ToString()
+                }, new Role
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Doctor",
+                    NormalizedName = "DOCTOR",
+                    ConcurrencyStamp = Guid.NewGuid().ToString()
+                }, new Role
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Patient",
+                    NormalizedName = "PATIENT",
+                    ConcurrencyStamp = Guid.NewGuid().ToString()
+                });
         }
     }
 }

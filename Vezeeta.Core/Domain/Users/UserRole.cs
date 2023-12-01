@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Vezeeta.Core.Domain.User
+namespace Vezeeta.Core.Domain.Users
 {
-    public class User:IdentityUser<Guid>
+    public class UserRole : IdentityUserRole<Guid>
     {
     }
 }
