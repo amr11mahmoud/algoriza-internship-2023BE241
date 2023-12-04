@@ -22,6 +22,22 @@
                     => new Error("null.request.error", $"{request} is null");
                 public static Error InvalidFieldDataType(string field)
                     => new Error("invalid.input.data", $"Input Data Error in field '{field}'", field);
+                public static Error InvalidImage()
+                    => new Error("invalid.image", $"Invalid image extension", "image");
+            }
+
+            public static class Doctors
+            {
+                public static Error DoctorNotFound()
+                    => new Error("doctor.not.found", "doctor not found!");
+                public static Error DoctorHasRequests()
+                    => new Error("doctor.has.requests", "can't delete doctor because he/she has requests already!");
+            }
+
+            public static class Patients
+            {
+                public static Error PatientNotFound()
+                    => new Error("patient.not.found", "patient not found!");
             }
 
             public static class Users
@@ -46,9 +62,24 @@
                     => new Error("user.login.not.allowed", "user login not allowed", "email");
                 public static Error UserLockout()
                    => new Error("user.lockout", "user account is lockout", "email");
+                public static Error PasswordNotMatched()
+                   => new Error("password.not.matched", "password not matched", "password");
+                public static Error RoleNotFound(string role)
+                    => new Error("role.not.found", $"role not found [{role}]!");
+                public static Error AlreadyInRole(string role)
+                    => new Error("user.already.in.role", $"user already in role [{role}]!");
+            }
+
+            public static class Settings
+            {
+                public static Error CouponCodeAlreadyExist(string code)
+                       => new Error("coupon.code.exist", $"coupon with code [{code}] already exist!", "Code");
+                public static Error CouponNotFound()
+                    => new Error("coupon.not.found", "coupon not found!");
             }
         }
 
+        
         public string Code { get; }
         public string Message { get; }
         public string? InvalidField { get;}

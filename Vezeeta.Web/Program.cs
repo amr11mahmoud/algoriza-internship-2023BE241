@@ -6,12 +6,17 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using System.Text;
-using Vezeeta.Core.Domain.User;
+using Vezeeta.Core.Domain.Users;
 using Vezeeta.Core.Repository;
+using Vezeeta.Core.Service.Bookings;
+using Vezeeta.Core.Service.Settings;
 using Vezeeta.Core.Service.Users;
 using Vezeeta.Repository;
 using Vezeeta.Repository.Repositories;
+using Vezeeta.Service.Bookings;
+using Vezeeta.Service.Settings;
 using Vezeeta.Service.Users;
+using Vezeeta.Web.Helpers;
 
 namespace Vezeeta.Web
 {
@@ -74,8 +79,8 @@ namespace Vezeeta.Web
             })
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders()
-                .AddUserStore<UserStore<User, Role, ApplicationDbContext, Guid, UserClaim, UserRole, UserLogin, UserToken, RoleClaim>>()
-                .AddRoleStore<RoleStore<Role, ApplicationDbContext, Guid, UserRole, RoleClaim>>()
+                .AddUserStore<UserStore<User, Role, ApplicationDbContext, int, UserClaim, UserRole, UserLogin, UserToken, RoleClaim>>()
+                .AddRoleStore<RoleStore<Role, ApplicationDbContext, int, UserRole, RoleClaim>>()
                 .AddUserManager<UserManager<User>>()
                 .AddRoleManager<RoleManager<Role>>()
                 .AddPasswordValidator<PasswordValidator<User>>()
@@ -105,7 +110,17 @@ namespace Vezeeta.Web
             builder.Services.AddAutoMapper(typeof(MapperConfig));
 
             builder.Services.AddTransient(typeof(IBaseRepository<>), typeof(BaseRepository<>));
+            builder.Services.AddTransient(typeof(IDoctorRepository), typeof(DoctorRepository));
+            builder.Services.AddTransient(typeof(IPatientRepository), typeof(PatientRepository));
+            builder.Services.AddTransient(typeof(IBookingRepository), typeof(BookingRepository));
+
             builder.Services.AddTransient(typeof(IUserService), typeof(UserService));
+            builder.Services.AddTransient(typeof(IDoctorService), typeof(DoctorService));
+            builder.Services.AddTransient(typeof(IPatientService), typeof(PatientService));
+            builder.Services.AddTransient(typeof(IBookingService), typeof(BookingService));
+            builder.Services.AddTransient(typeof(ICouponService), typeof(CouponService));
+
+            builder.Services.AddTransient(typeof(IImageHelper), typeof(ImageHelper));
 
 
             var app = builder.Build();

@@ -2,7 +2,7 @@
 
 namespace Vezeeta.Core.Domain.Users
 {
-    public class UserToken : IdentityUserToken<Guid>
+    public class UserToken : IdentityUserToken<int>
     {
     }
 }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Vezeeta.Core.Domain.Users
 {
-    public class Role:IdentityRole<Guid>
+    public class Role:IdentityRole<int>
     {
         public Role() { }
         public Role(string name) : base(name)

@@ -1,10 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Vezeeta.Core.Domain.Base;
+using System.Linq.Expressions;
 using Vezeeta.Core.Repository;
 
 namespace Vezeeta.Repository.Repositories
@@ -18,17 +13,44 @@ namespace Vezeeta.Repository.Repositories
             _context = context;
         }
 
-        public void Add(T entity)
+        public IEnumerable<T> GetAll()
+        {
+            return _context.Set<T>().ToList();
+        }
+
+        public async Task<IEnumerable<T>> GetAllAsync()
+        {
+            return await _context.Set<T>().ToListAsync();
+        }
+
+        public T? GetById(int id)
+        {
+            return _context.Set<T>().Find(id);
+        }
+
+        public async Task<T?> GetByIdAsync(int id)
+        {
+            return await _context.Set<T>().FindAsync(id);
+        }
+
+        public T Add(T entity)
         {
             _context.Set<T>().Add(entity);
+            return entity;
         }
 
-        public async Task AddAsync(T entity)
+        public async Task<T> AddAsync(T entity)
         {
             await _context.Set<T>().AddAsync(entity);
+            return entity;
         }
 
-        public bool Delete(string id)
+        public async Task<int> CountAsync(Expression<Func<T, bool>> match)
+        {
+            return await _context.Set<T>().CountAsync(match);
+        }
+
+        public bool Delete(int id)
         {
             T? entity = _context.Set<T>().Find(id);
 
@@ -39,7 +61,7 @@ namespace Vezeeta.Repository.Repositories
             return true;
         }
 
-        public async Task<bool> DeleteAsync(string id)
+        public async Task<bool> DeleteAsync(int id)
         {
             T? entity = await _context.Set<T>().FindAsync(id);
 
@@ -50,19 +72,50 @@ namespace Vezeeta.Repository.Repositories
             return true;
         }
 
-        //public IEnumerable<T> GetAll()
-        //{
-        //    IEnumerable<T> entities = await _context.Set<T>().Where();
-        //}
-
-        public T GetById(string id)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<int> SaveChangesAsync()
         {
             return await _context.SaveChangesAsync();
+        }
+
+        public async Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>> match, int page, int pageSize, string[]? includes = null)
+        {
+            IQueryable<T> query = _context.Set<T>().Where(match);
+
+            if (page <= 0) page = 1;
+            if (pageSize <= 0) pageSize = 10;
+
+            if (includes != null)
+                foreach (var include in includes)
+                    query = query.Include(include);
+
+            var entities = await query.Skip(pageSize * (page - 1)).Take(pageSize).ToListAsync();
+
+            return entities;
+        }
+
+        public async Task<T?> FindAsync(Expression<Func<T, bool>> match, string[]? includes = null)
+        {
+            IQueryable<T> query = _context.Set<T>();
+
+            if (includes != null)
+                foreach (var include in includes)
+                    query = query.Include(include);
+
+            var entity = await query.SingleOrDefaultAsync(match);
+
+            return entity;
+        }
+
+        public async Task<bool> AnyAsync(Expression<Func<T, bool>> match)
+        {
+            return await _context.Set<T>().AnyAsync(match);
+        }
+
+        public T Update(T entity)
+        {
+            _context.Set<T>().Update(entity);
+
+            return entity;
         }
     }
 }

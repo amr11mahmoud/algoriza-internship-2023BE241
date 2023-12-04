@@ -8,6 +8,7 @@ using System.Security.Claims;
 using System.Text;
 using Vezeeta.Core.Consts;
 using Vezeeta.Core.Domain.Users;
+using Vezeeta.Core.Enums;
 using Vezeeta.Core.Repository;
 using Vezeeta.Core.Service.Users;
 using Vezeeta.Core.Shared;
@@ -20,6 +21,7 @@ namespace Vezeeta.Service.Users
         private readonly SignInManager<User> _signInManager;
         private IBaseRepository<UserRefreshToken> _refreshTokenRepo;
         private readonly IConfiguration _configuration;
+        private readonly RoleManager<Role> _roleManager;
 
         public UserService(
             IUserStore<User> store,
@@ -27,22 +29,65 @@ namespace Vezeeta.Service.Users
             IPasswordHasher<User> passwordHasher,
             IEnumerable<IUserValidator<User>> userValidators,
             IEnumerable<IPasswordValidator<User>> passwordValidators,
-            ILookupNormalizer keyNormalizer, 
+            ILookupNormalizer keyNormalizer,
             IdentityErrorDescriber errors,
-            IServiceProvider services, 
-            ILogger<UserManager<User>> logger, 
+            IServiceProvider services,
+            ILogger<UserManager<User>> logger,
             SignInManager<User> signInManager,
             IBaseRepository<UserRefreshToken> refreshTokenRepo,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            RoleManager<Role> roleManager)
             : base(store, optionsAccessor, passwordHasher, userValidators, passwordValidators, keyNormalizer, errors, services, logger)
         {
             _signInManager = signInManager;
             _refreshTokenRepo = refreshTokenRepo;
             _configuration = configuration;
+            _roleManager = roleManager;
+        }
+
+        public new async Task<Result<bool>> UpdateUserAsync(User newUserData)
+        {
+            User? user = await FindByIdAsync(newUserData.Id.ToString());
+
+            if (user == null)
+            {
+                return Result.Failure<bool>(Errors.Users.UserNotFound());
+            }
+
+            user.Update(newUserData);
+
+            IdentityResult updateResult = await UpdateAsync(user);
+
+            if (!updateResult.Succeeded)
+            {
+                return Result.Failure<bool>(MapIdentityErrorToAppError(updateResult));
+            }
+
+            return Result.Success(true);
+        }
+
+        public async Task<Result<bool>> DeleteUserAsync(int id)
+        {
+            User? user = await FindByIdAsync(id.ToString());
+
+            if (user == null)
+            {
+                return Result.Failure<bool>(Errors.Users.UserNotFound());
+            }
+
+            IdentityResult deleteResult = await DeleteAsync(user);
+
+            if (!deleteResult.Succeeded)
+            {
+                return Result.Failure<bool>(MapIdentityErrorToAppError(deleteResult));
+            }
+
+            return Result.Success(true);
         }
 
         public async Task<Result<UserJwtToken>> LoginUserAsync(string email, string password)
         {
+
             if (string.IsNullOrEmpty(email)) return Result.Failure<UserJwtToken>(Errors.Users.EmailError());
             if (string.IsNullOrEmpty(password)) return Result.Failure<UserJwtToken>(Errors.Users.InvalidPassword());
 
@@ -62,22 +107,38 @@ namespace Vezeeta.Service.Users
             return Result.Success(userToken);
         }
 
-        public async Task<Result<bool>> RegisterUserAsync(User user, string password)
+        public async Task<Result<User>> RegisterUserAsync(User user, string password, UserDiscriminator discriminator)
         {
+            user.Discriminator = discriminator;
+
             string hashedPassword = PasswordHasher.HashPassword(user, password);
 
             Result setPasswordResult = User.SetUserPassword(user, hashedPassword);
 
-            if (setPasswordResult.IsFailure) return Result.Failure<bool>(setPasswordResult.Error);
+            if (setPasswordResult.IsFailure) return Result.Failure<User>(setPasswordResult.Error);
 
-            IdentityResult createUserResult = await CreateAsync(user);
+            IdentityResult insertUserResult = await CreateAsync(user);
 
-            if (!createUserResult.Succeeded)
+            if (!insertUserResult.Succeeded)
             {
-                string errorCode = createUserResult.Errors.FirstOrDefault() is null ? "NULL" : createUserResult.Errors.FirstOrDefault().Code;
-                string errorMsg = createUserResult.Errors.FirstOrDefault() is null ? "NULL" : createUserResult.Errors.FirstOrDefault().Description;
-                return Result.Failure<bool>(Errors.Users.RegisterUserError(errorCode, errorMsg));
+                return Result.Failure<User>(MapIdentityErrorToAppError(insertUserResult));
             }
+
+            return Result.Success(user);
+        }
+
+        public async Task<Result<bool>> AddUserToRoleAsync(User user, string role)
+        {
+            if (!await _roleManager.RoleExistsAsync(role)) return Result.Failure<bool>(Errors.Users.RoleNotFound(role));
+            if (await IsInRoleAsync(user, role)) return Result.Failure<bool>(Errors.Users.AlreadyInRole(role));
+
+            IdentityResult AddToRoleResult = await AddToRoleAsync(user, role);
+
+            if (!AddToRoleResult.Succeeded)
+            {
+                return Result.Failure<bool>(MapIdentityErrorToAppError(AddToRoleResult));
+            }
+
             return Result.Success(true);
         }
 
@@ -85,16 +146,23 @@ namespace Vezeeta.Service.Users
         {
             return new UserJwtToken
             {
-                AccessToken = GenerateAccessToken(user),
+                AccessToken = await GenerateAccessToken(user),
                 RefreshToken = await GenerateRefreshToken(user),
             };
         }
 
-        private JWTToken GenerateAccessToken(User user)
+        private async Task<JWTToken> GenerateAccessToken(User user)
         {
+            var userRoles = await GetRolesAsync(user);
+
             var claims = new List<Claim> {
                 new Claim( ClaimTypes.NameIdentifier, user.Id.ToString()),
             };
+
+            foreach (var role in userRoles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
 
             string key = _configuration["Authentication:JwtBearer:SecurityKey"];
 
@@ -150,6 +218,14 @@ namespace Vezeeta.Service.Users
                 Token = token,
                 Expiration = expiration
             };
+        }
+
+        public static Error MapIdentityErrorToAppError(IdentityResult result)
+        {
+            string errorCode = result.Errors.FirstOrDefault() is null ? "NULL" : result.Errors.FirstOrDefault().Code;
+            string errorMsg = result.Errors.FirstOrDefault() is null ? "NULL" : result.Errors.FirstOrDefault().Description;
+
+            return Errors.Users.RegisterUserError(errorCode, errorMsg);
         }
     }
 }

@@ -1,11 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using Vezeeta.Core.Domain.Base;
 
 namespace Vezeeta.Core.Domain.Users
 {
-    public class UserRefreshToken
+    public class UserRefreshToken:Entity<int>
     {
-        public Guid Id { get; set; }
-        public Guid UserId { get; set; }
+        public int UserId { get; set; }
         public string Token { get; set; } = string.Empty;
         public bool IsUsed { get; set; }
         public DateTime ExpirationDate { get; set; }

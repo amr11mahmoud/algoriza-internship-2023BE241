@@ -12,8 +12,8 @@ using Vezeeta.Repository;
 namespace Vezeeta.Repository.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231128125641_AddRolesSeedData")]
-    partial class AddRolesSeedData
+    [Migration("20231202090201_InitIdentityTables")]
+    partial class InitIdentityTables
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,11 +25,34 @@ namespace Vezeeta.Repository.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Vezeeta.Core.Domain.User.Role", b =>
+            modelBuilder.Entity("Vezeeta.Core.Domain.Lookup.Specialization", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Specialization");
+                });
+
+            modelBuilder.Entity("Vezeeta.Core.Domain.Users.Role", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -51,32 +74,9 @@ namespace Vezeeta.Repository.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("Roles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("9dbb3cda-bd5f-472b-850f-ff78122a97ab"),
-                            ConcurrencyStamp = "d0bacb5c-6d29-420a-a65c-da53d348dbfa",
-                            Name = "Admin",
-                            NormalizedName = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = new Guid("f910e372-849d-4885-a2d5-93b117071862"),
-                            ConcurrencyStamp = "e912a3ff-3c8c-4246-848d-b4a58ec9c6f2",
-                            Name = "Doctor",
-                            NormalizedName = "DOCTOR"
-                        },
-                        new
-                        {
-                            Id = new Guid("27cc8a2c-2d86-4b66-bc04-8a6ec21719f7"),
-                            ConcurrencyStamp = "98052892-9c41-469f-ab73-b6364e1d504f",
-                            Name = "Patient",
-                            NormalizedName = "PATIENT"
-                        });
                 });
 
-            modelBuilder.Entity("Vezeeta.Core.Domain.User.RoleClaim", b =>
+            modelBuilder.Entity("Vezeeta.Core.Domain.Users.RoleClaim", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -90,8 +90,8 @@ namespace Vezeeta.Repository.Migrations
                     b.Property<string>("ClaimValue")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("RoleId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -100,11 +100,13 @@ namespace Vezeeta.Repository.Migrations
                     b.ToTable("RoleClaims", (string)null);
                 });
 
-            modelBuilder.Entity("Vezeeta.Core.Domain.User.User", b =>
+            modelBuilder.Entity("Vezeeta.Core.Domain.Users.User", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
@@ -113,12 +115,32 @@ namespace Vezeeta.Repository.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("DateOfBirth")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Discriminator")
+                        .HasColumnType("int");
+
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Gender")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -146,6 +168,9 @@ namespace Vezeeta.Repository.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("Specialize")
+                        .HasColumnType("int");
+
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
@@ -163,10 +188,12 @@ namespace Vezeeta.Repository.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
+                    b.HasIndex("Specialize");
+
                     b.ToTable("Users", (string)null);
                 });
 
-            modelBuilder.Entity("Vezeeta.Core.Domain.User.UserClaim", b =>
+            modelBuilder.Entity("Vezeeta.Core.Domain.Users.UserClaim", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -180,8 +207,8 @@ namespace Vezeeta.Repository.Migrations
                     b.Property<string>("ClaimValue")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -190,7 +217,7 @@ namespace Vezeeta.Repository.Migrations
                     b.ToTable("UserClaims", (string)null);
                 });
 
-            modelBuilder.Entity("Vezeeta.Core.Domain.User.UserLogin", b =>
+            modelBuilder.Entity("Vezeeta.Core.Domain.Users.UserLogin", b =>
                 {
                     b.Property<string>("LoginProvider")
                         .HasColumnType("nvarchar(450)");
@@ -201,8 +228,8 @@ namespace Vezeeta.Repository.Migrations
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
                     b.HasKey("LoginProvider", "ProviderKey");
 
@@ -211,13 +238,13 @@ namespace Vezeeta.Repository.Migrations
                     b.ToTable("UserLogins", (string)null);
                 });
 
-            modelBuilder.Entity("Vezeeta.Core.Domain.User.UserRole", b =>
+            modelBuilder.Entity("Vezeeta.Core.Domain.Users.UserRole", b =>
                 {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
-                    b.Property<Guid>("RoleId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int");
 
                     b.HasKey("UserId", "RoleId");
 
@@ -226,10 +253,10 @@ namespace Vezeeta.Repository.Migrations
                     b.ToTable("UserRoles", (string)null);
                 });
 
-            modelBuilder.Entity("Vezeeta.Core.Domain.User.UserToken", b =>
+            modelBuilder.Entity("Vezeeta.Core.Domain.Users.UserToken", b =>
                 {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
                     b.Property<string>("LoginProvider")
                         .HasColumnType("nvarchar(450)");
@@ -245,51 +272,60 @@ namespace Vezeeta.Repository.Migrations
                     b.ToTable("UserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Vezeeta.Core.Domain.User.RoleClaim", b =>
+            modelBuilder.Entity("Vezeeta.Core.Domain.Users.RoleClaim", b =>
                 {
-                    b.HasOne("Vezeeta.Core.Domain.User.Role", null)
+                    b.HasOne("Vezeeta.Core.Domain.Users.Role", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Vezeeta.Core.Domain.User.UserClaim", b =>
+            modelBuilder.Entity("Vezeeta.Core.Domain.Users.User", b =>
                 {
-                    b.HasOne("Vezeeta.Core.Domain.User.User", null)
+                    b.HasOne("Vezeeta.Core.Domain.Lookup.Specialization", "Specialization")
+                        .WithMany()
+                        .HasForeignKey("Specialize");
+
+                    b.Navigation("Specialization");
+                });
+
+            modelBuilder.Entity("Vezeeta.Core.Domain.Users.UserClaim", b =>
+                {
+                    b.HasOne("Vezeeta.Core.Domain.Users.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Vezeeta.Core.Domain.User.UserLogin", b =>
+            modelBuilder.Entity("Vezeeta.Core.Domain.Users.UserLogin", b =>
                 {
-                    b.HasOne("Vezeeta.Core.Domain.User.User", null)
+                    b.HasOne("Vezeeta.Core.Domain.Users.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Vezeeta.Core.Domain.User.UserRole", b =>
+            modelBuilder.Entity("Vezeeta.Core.Domain.Users.UserRole", b =>
                 {
-                    b.HasOne("Vezeeta.Core.Domain.User.Role", null)
+                    b.HasOne("Vezeeta.Core.Domain.Users.Role", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Vezeeta.Core.Domain.User.User", null)
+                    b.HasOne("Vezeeta.Core.Domain.Users.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Vezeeta.Core.Domain.User.UserToken", b =>
+            modelBuilder.Entity("Vezeeta.Core.Domain.Users.UserToken", b =>
                 {
-                    b.HasOne("Vezeeta.Core.Domain.User.User", null)
+                    b.HasOne("Vezeeta.Core.Domain.Users.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)

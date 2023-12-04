@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Vezeeta.Core.Domain.Users
 {
-    public class UserLogin : IdentityUserLogin<Guid>
+    public class UserLogin : IdentityUserLogin<int>
     {
     }
 }
