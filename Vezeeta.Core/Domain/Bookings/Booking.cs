@@ -26,6 +26,7 @@ namespace Vezeeta.Core.Domain.Bookings
 
         [ForeignKey("AppointmentTime")]
         public int AppointmentTimeId { get; set; }
-        public virtual AppointmentTime AppointmentTime { get; set; }
+        public virtual AppointmentTime Time { get; set; }
+        public float FinalPrice { get; set; }
     }
 }

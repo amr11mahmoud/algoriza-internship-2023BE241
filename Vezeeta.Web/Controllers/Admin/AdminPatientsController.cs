@@ -1,9 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using Vezeeta.Core.Consts;
 using Vezeeta.Core.Service.Users;
+using Vezeeta.Service.Dtos.Response.Doctors;
 using Vezeeta.Service.Dtos.Response.Patients;
-using Vezeeta.Web.Helpers;
 
 namespace Vezeeta.Web.Controllers.Admin
 {
@@ -35,7 +34,7 @@ namespace Vezeeta.Web.Controllers.Admin
         }
 
         [HttpGet]
-        public async Task<ActionResult<GetPatientDto>> GetById(int id)
+        public async Task<ActionResult<GetPatientAndRequestsDto>> GetById(int id)
         {
             var getPatientResult = await _patientService.GetPatientWithBookingsAsync(id);
 
@@ -44,7 +43,33 @@ namespace Vezeeta.Web.Controllers.Admin
                 return BadRequest(getPatientResult.Error);
             }
 
-            var response = getPatientResult.Value;
+            var (patient, bookings) = getPatientResult.Value;
+
+            List<PatientRequestDto> requests = new List<PatientRequestDto>();
+
+            bookings.ForEach(b =>
+            {
+                var request = new PatientRequestDto
+                {
+                    Day = b.Time.Appointment.Day.ToString(),
+                    DiscountCode = b.Coupon != null ? b.Coupon.Code : string.Empty,
+                    DoctorName = b.Doctor.FullName,
+                    ImageUrl = b.Doctor.ImageUrl,
+                    Specialization = _mapper.Map<SpecializationDto>(b.Doctor.Specialization),
+                    Price = b.Doctor.Price,
+                    FinalPrice = b.FinalPrice,
+                    Status = b.Status.ToString(),
+                    Time = b.Time.Time
+                };
+
+                requests.Add(request);
+            });
+
+            var response = new GetPatientAndRequestsDto
+            {
+                Details = _mapper.Map<GetPatientDto>(patient),
+                Requests = requests
+            };
 
             return Ok(response);
         }

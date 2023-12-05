@@ -13,17 +13,6 @@ namespace Vezeeta.Repository.Repositories
         {
         }
 
-        public async Task<IEnumerable<User>> FindAllPatientsAsync(int page, int pageSize, string search, string[]? includes = null)
-        {
-            Expression<Func<User, bool>> exp = (u) => u.Discriminator == UserDiscriminator.Patient;
-
-            if (!string.IsNullOrEmpty(search)) exp = (u) => u.Discriminator == UserDiscriminator.Patient && u.FullName.Contains(search);
-
-            IEnumerable<User> patients = await FindAllAsync(exp, page, pageSize, includes);
-
-            return patients;
-        }
-
         public async Task<(User?, List<Booking>)> FindPatientWithBookings(int id)
         {
             List<Booking> bookings = new List<Booking>();
@@ -33,11 +22,11 @@ namespace Vezeeta.Repository.Repositories
             {
                 bookings = await _context.Bookings
                     .Where(b => b.PatientId == id)
-                    .Include(b=> b.Doctor)
-                    .ThenInclude(b=> b.Specialization)
-                    .Include(b=> b.Coupon)
-                    .Include(b=> b.AppointmentTime)
-                    .ThenInclude(b=> b.Appointment)
+                    .Include(b => b.Doctor)
+                    .ThenInclude(b => b.Specialization)
+                    .Include(b => b.Coupon)
+                    .Include(b => b.Time)
+                    .ThenInclude(b => b.Appointment)
                     .ToListAsync();
             }
 

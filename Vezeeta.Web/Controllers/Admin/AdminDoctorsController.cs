@@ -29,7 +29,7 @@ namespace Vezeeta.Web.Controllers.Admin
         [HttpGet]
         public async Task<ActionResult<IEnumerable<GetDoctorDto>>> GetAll(int page = 1, int pageSize = 10, string search = "")
         {
-            var getDoctorsResult = await _doctorService.GetAllDoctorsAsync(page, pageSize, search, new[] { AppConsts.DomainModels.Specialization });
+            var getDoctorsResult = await _doctorService.GetAllDoctorsAsync(page, pageSize, search, new[] { AppConsts.DomainModels.DoctorSpecialization });
 
             if (getDoctorsResult.IsFailure)
             {
@@ -44,7 +44,7 @@ namespace Vezeeta.Web.Controllers.Admin
         [HttpGet]
         public async Task<ActionResult<GetDoctorDto>> GetById(int id)
         {
-            var getDoctorResult = await _doctorService.GetDoctorAsync(id, new[] { AppConsts.DomainModels.Specialization });
+            var getDoctorResult = await _doctorService.GetDoctorAsync(id, new[] { AppConsts.DomainModels.DoctorSpecialization });
 
             if (getDoctorResult.IsFailure)
             {

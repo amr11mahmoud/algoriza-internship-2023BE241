@@ -1,4 +1,6 @@
-﻿using Vezeeta.Core.Consts;
+﻿using System.Linq.Expressions;
+using Vezeeta.Core.Consts;
+using Vezeeta.Core.Domain.Bookings;
 using Vezeeta.Core.Domain.Users;
 using Vezeeta.Core.Enums;
 using Vezeeta.Core.Repository;
@@ -22,7 +24,11 @@ namespace Vezeeta.Service.Users
 
         public async Task<Result<IEnumerable<User>>> GetAllDoctorsAsync(int page, int pageSize, string search, string[]? includes = null)
         {
-            IEnumerable<User> doctors =  await _doctorRepository.FindAllDoctorsAsync(page, pageSize, search, includes);
+            Expression<Func<User, bool>> searchCondition = (u) => u.Discriminator == UserDiscriminator.Doctor;
+
+            if (!string.IsNullOrEmpty(search)) searchCondition = (u) => u.Discriminator == UserDiscriminator.Doctor && u.FullName.Contains(search);
+
+            IEnumerable<User> doctors = await _doctorRepository.FindAllAsync(searchCondition, page, pageSize, includes);
 
             return Result.Success(doctors);
         }
@@ -49,13 +55,10 @@ namespace Vezeeta.Service.Users
         public async Task<Result<bool>> AddDoctorAsync(User user)
         {
 
-            Result<User> registerDoctorResult = await _userService.RegisterUserAsync(user, AppConsts.User.DoctorBasePassword, UserDiscriminator.Doctor);
+            Result<User> registerDoctorResult =
+                await _userService.RegisterUserAsync(user, AppConsts.User.DoctorBasePassword, UserDiscriminator.Doctor, new[] { AppConsts.Roles.Doctor });
 
             if (registerDoctorResult.IsFailure) return Result.Failure<bool>(registerDoctorResult.Error);
-
-            Result<bool> addDoctorToRoleResult = await _userService.AddUserToRoleAsync(registerDoctorResult.Value, AppConsts.Roles.Doctor);
-
-            if (addDoctorToRoleResult.IsFailure) return Result.Failure<bool>(addDoctorToRoleResult.Error);
 
             return Result.Success(true);
         }
@@ -83,6 +86,17 @@ namespace Vezeeta.Service.Users
             if (deleteDoctorResult.IsFailure) return Result.Failure<bool>(deleteDoctorResult.Error);
 
             return Result.Success(true);
+        }
+
+        public async Task<Result<IEnumerable<Booking>>> GetDoctorBookings(int doctorId, int page, int pageSize, DateTime? date, string[]? includes = null)
+        {
+            Expression<Func<Booking, bool>> searchCondition = (b) => b.DoctorId == doctorId;
+
+            if (date != null) searchCondition = (b) => b.DoctorId == doctorId && b.Date == date;
+
+            IEnumerable<Booking> bookings = await _bookingRepository.FindAllAsync(searchCondition, page, pageSize, includes);
+
+            return Result.Success(bookings);
         }
     }
 }

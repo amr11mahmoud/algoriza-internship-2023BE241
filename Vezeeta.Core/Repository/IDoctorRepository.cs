@@ -10,6 +10,5 @@ namespace Vezeeta.Core.Repository
 {
     public interface IDoctorRepository: IBaseRepository<User>
     {
-        Task<IEnumerable<User>> FindAllDoctorsAsync(int page, int pageSize, string search, string[]? includes = null);
     }
 }

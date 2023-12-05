@@ -1,4 +1,5 @@
-﻿using Vezeeta.Core.Domain.Users;
+﻿using Vezeeta.Core.Domain.Bookings;
+using Vezeeta.Core.Domain.Users;
 using Vezeeta.Core.Shared;
 
 namespace Vezeeta.Core.Service.Users
@@ -11,5 +12,6 @@ namespace Vezeeta.Core.Service.Users
         Task<Result<bool>> AddDoctorAsync(User user);
         Task<Result<bool>> UpdateDoctorAsync(User user);
         Task<Result<bool>> DeleteDoctorAsync(int id);
+        Task<Result<IEnumerable<Booking>>> GetDoctorBookings(int doctorId, int page, int pageSize, DateTime? date, string[]? includes = null);
     }
 }

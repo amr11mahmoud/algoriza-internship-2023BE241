@@ -107,7 +107,7 @@ namespace Vezeeta.Service.Users
             return Result.Success(userToken);
         }
 
-        public async Task<Result<User>> RegisterUserAsync(User user, string password, UserDiscriminator discriminator)
+        public async Task<Result<User>> RegisterUserAsync(User user, string password, UserDiscriminator discriminator, string[]? roles = null)
         {
             user.Discriminator = discriminator;
 
@@ -124,6 +124,15 @@ namespace Vezeeta.Service.Users
                 return Result.Failure<User>(MapIdentityErrorToAppError(insertUserResult));
             }
 
+            if (roles != null)
+            {
+                foreach (var role in roles)
+                {
+                    Result<bool> addUserToRoleResult = await AddUserToRoleAsync(user, role);
+
+                    if (addUserToRoleResult.IsFailure) return Result.Failure<User>(addUserToRoleResult.Error);
+                }
+            }
             return Result.Success(user);
         }
 

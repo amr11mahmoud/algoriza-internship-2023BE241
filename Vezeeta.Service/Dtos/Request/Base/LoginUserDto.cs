@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Vezeeta.Service.Dtos.Request.Patients
+namespace Vezeeta.Service.Dtos.Request.Base
 {
-    public class LoginPatientDto
+    public class LoginUserDto
     {
         public string Email { get; set; }
         public string Password { get; set; }
