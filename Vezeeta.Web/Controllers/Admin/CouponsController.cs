@@ -22,19 +22,17 @@ namespace Vezeeta.Web.Controllers.Admin
         [HttpGet]
         public async Task<ActionResult<GetCouponDto>> Get(int id)
         {
-            Result<Coupon> getCouponResult = await _couponService.GetCouponAsync(id);
-            if (getCouponResult.IsFailure) return BadRequest(getCouponResult.Error);
+            Coupon? coupon = await _couponService.GetCouponAsync(id);
+            if (coupon == null) return BadRequest(Error.Errors.Settings.CouponNotFound());
 
-            return Ok(_mapper.Map<GetCouponDto>(getCouponResult.Value));
+            return Ok(_mapper.Map<GetCouponDto>(coupon));
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<GetCouponDto>>> GetAll()
         {
-            Result<IEnumerable<Coupon>> getCouponsResult = await _couponService.GetAllCouponsAsync();
-            if (getCouponsResult.IsFailure) return BadRequest(getCouponsResult.Error);
-
-            return Ok(_mapper.Map<IEnumerable<GetCouponDto>>(getCouponsResult.Value));
+            IEnumerable<Coupon> coupons = await _couponService.GetAllCouponsAsync();
+            return Ok(_mapper.Map<IEnumerable<GetCouponDto>>(coupons));
         }
 
         [HttpPost]

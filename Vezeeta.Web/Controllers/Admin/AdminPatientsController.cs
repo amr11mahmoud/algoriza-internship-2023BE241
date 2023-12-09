@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Vezeeta.Core.Service.Users;
 using Vezeeta.Service.Dtos.Response.Doctors;
@@ -6,7 +8,8 @@ using Vezeeta.Service.Dtos.Response.Patients;
 
 namespace Vezeeta.Web.Controllers.Admin
 {
-    [Route("api/admin/patients/[action]")]
+    [Route("Api/Admin/Patients/[action]")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
     public class AdminPatientsController : ApplicationController
     {
         private readonly IPatientService _patientService;

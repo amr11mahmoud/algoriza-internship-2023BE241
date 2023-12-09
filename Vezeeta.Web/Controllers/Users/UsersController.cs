@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Vezeeta.Core.Consts;
 using Vezeeta.Core.Domain.Users;
@@ -11,7 +13,7 @@ using Vezeeta.Web.Helpers;
 
 namespace Vezeeta.Web.Controllers.Users
 {
-    [Route("api/[controller]/[action]")]
+    [Route("Api/[controller]/[action]")]
     public class UsersController: ApplicationController
     {
         private readonly IImageHelper _imageHelper;
@@ -57,6 +59,13 @@ namespace Vezeeta.Web.Controllers.Users
             if (loginResult.IsFailure) return BadRequest(loginResult.Error);
 
             return Ok(loginResult.Value);
+        }
+
+        [HttpGet("Google")]
+        [Authorize(AuthenticationSchemes = GoogleDefaults.AuthenticationScheme)]
+        public ActionResult<bool> ExternalLogin()
+        {
+            return Ok(true);
         }
     }
 }

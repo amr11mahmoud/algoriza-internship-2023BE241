@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System.Reflection.Emit;
 using Vezeeta.Core.Domain.Appointments;
+using Vezeeta.Core.Domain.Base;
 using Vezeeta.Core.Domain.Bookings;
 using Vezeeta.Core.Domain.Coupons;
 using Vezeeta.Core.Domain.Lookup;
@@ -32,6 +33,12 @@ namespace Vezeeta.Repository
             base.OnModelCreating(builder);
 
             builder.Entity<User>().Property(u => u.FullName).HasComputedColumnSql("[FirstName] + ' ' + [LastName]");
+
+            builder.Entity<Appointment>()
+                .HasIndex(p => new { p.Day, p.DoctorId }).IsUnique();
+
+            builder.Entity<AppointmentTime>()
+                .HasIndex(p => new { p.Time, p.AppointmentId }).IsUnique();
 
             builder.Entity<User>(entity =>
             {

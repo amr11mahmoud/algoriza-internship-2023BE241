@@ -1,7 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Vezeeta.Core.Shared;
-using Vezeeta.Web.Helpers;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Vezeeta.Web.Controllers
 {
@@ -10,6 +8,22 @@ namespace Vezeeta.Web.Controllers
     {
         public ApplicationController()
         {
+        }
+
+        protected int GetUserId()
+        {
+            var subjectIdClaim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+
+            if (subjectIdClaim != null)
+            {
+                int userId;
+                bool userIdParsedSuccessfully = int.TryParse(subjectIdClaim.Value, out userId);
+
+                if (userIdParsedSuccessfully)
+                    return userId;
+            }
+
+            return 0;
         }
 
     }

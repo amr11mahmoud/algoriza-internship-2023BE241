@@ -3,6 +3,6 @@
     public class TopSpecializationResponseDto
     {
         public string FullName { get; set; }
-        public NumberOfRequestsResponseDto Requests { get; set; }
+        public int Requests { get; set; }
     }
 }

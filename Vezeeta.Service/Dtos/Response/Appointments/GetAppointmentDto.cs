@@ -1,22 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Vezeeta.Core.Enums;
+﻿using System.Text.Json.Serialization;
 
 namespace Vezeeta.Service.Dtos.Response.Appointments
 {
     public class GetAppointmentDto
     {
-        public Days Day { get; set; }
-        public IEnumerable<AppointmentScheduleDto> Times { get; set; }
+        public int Id { get; set; }
+        public string Day { get; set; }
+        public IEnumerable<GetAppointmentTimeDto> Times { get; set; }
     }
 
-    public class AppointmentScheduleDto
+    public class GetAppointmentTimeDto
     {
         public int Id { get; set; }
-        public DateTime Time { get; set; }
-        public bool Booked { get; set; }
+        public string Time { get; set; }
     }
 }

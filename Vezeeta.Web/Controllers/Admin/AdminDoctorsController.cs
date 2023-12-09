@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Vezeeta.Core.Consts;
 using Vezeeta.Core.Domain.Users;
@@ -10,7 +12,8 @@ using Vezeeta.Web.Helpers;
 
 namespace Vezeeta.Web.Controllers.Admin
 {
-    [Route("api/admin/doctors/[action]")]
+    [Route("Api/Admin/Doctors/[action]")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
     public class AdminDoctorsController : ApplicationController
     {
         private readonly IDoctorService _doctorService;
@@ -29,14 +32,8 @@ namespace Vezeeta.Web.Controllers.Admin
         [HttpGet]
         public async Task<ActionResult<IEnumerable<GetDoctorDto>>> GetAll(int page = 1, int pageSize = 10, string search = "")
         {
-            var getDoctorsResult = await _doctorService.GetAllDoctorsAsync(page, pageSize, search, new[] { AppConsts.DomainModels.DoctorSpecialization });
-
-            if (getDoctorsResult.IsFailure)
-            {
-                return BadRequest(getDoctorsResult.Error);
-            }
-
-            var response = _mapper.Map<IEnumerable<GetDoctorDto>>(getDoctorsResult.Value);
+            var doctors = await _doctorService.GetAllDoctorsAsync(page, pageSize, search, new[] { AppConsts.DomainModels.Specialization });
+            var response = _mapper.Map<IEnumerable<GetDoctorDto>>(doctors);
 
             return Ok(response);
         }
@@ -44,14 +41,8 @@ namespace Vezeeta.Web.Controllers.Admin
         [HttpGet]
         public async Task<ActionResult<GetDoctorDto>> GetById(int id)
         {
-            var getDoctorResult = await _doctorService.GetDoctorAsync(id, new[] { AppConsts.DomainModels.DoctorSpecialization });
-
-            if (getDoctorResult.IsFailure)
-            {
-                return BadRequest(getDoctorResult.Error);
-            }
-
-            var response = _mapper.Map<GetDoctorDto>(getDoctorResult.Value);
+            var doctor = await _doctorService.GetDoctorAsync(id, new[] { AppConsts.DomainModels.Specialization });
+            var response = _mapper.Map<GetDoctorDto>(doctor);
 
             return Ok(response);
         }

@@ -1,39 +1,42 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Vezeeta.Core.Service.Bookings;
 using Vezeeta.Core.Service.Users;
 using Vezeeta.Service.Dtos.Response.Admin;
 
 namespace Vezeeta.Web.Controllers.Admin
 {
-    [Route("api/admin/dashboard/[action]")]
+    [Route("Api/Admin/Dashboard")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
     public class AdminDashboardController : ApplicationController
     {
         private readonly IDoctorService _doctorService;
         private readonly IPatientService _patientService;
         private readonly IBookingService _bookingService;
-
-        public AdminDashboardController(IDoctorService doctorService, IPatientService patientService, IBookingService bookingService)
+        private readonly IMapper _mapper;
+        public AdminDashboardController(
+            IDoctorService doctorService,
+            IPatientService patientService,
+            IBookingService bookingService,
+            IMapper mapper)
         {
             _doctorService = doctorService;
             _patientService = patientService;
             _bookingService = bookingService;
+            _mapper = mapper;
         }
 
 
-        [HttpGet]
+        [HttpGet("Doctors/Count")]
         public async Task<ActionResult<int>> GetNumberOfDoctors()
         {
-            var getNumberOfDoctorsResult = await _doctorService.GetDoctorsCountAsync();
-
-            if (getNumberOfDoctorsResult.IsFailure)
-            {
-                return BadRequest(getNumberOfDoctorsResult.Error);
-            }
-
-            return Ok(getNumberOfDoctorsResult.Value);
+            int numOfDoctors = await _doctorService.GetDoctorsCountAsync();
+            return Ok(numOfDoctors);
         }
 
-        [HttpGet]
+        [HttpGet("Patients/Count")]
         public async Task<ActionResult<int>> GetNumberOfPatients()
         {
             int numberOfPatients = await _patientService.GetPatientsCountAsync();
@@ -41,7 +44,7 @@ namespace Vezeeta.Web.Controllers.Admin
         }
 
 
-        [HttpGet]
+        [HttpGet("Bookings/Count")]
         public async Task<ActionResult<NumberOfRequestsResponseDto>> GetNumberOfRequests()
         {
             var bookingsCountList = await _bookingService.GetBookingsCountAsync();
@@ -57,16 +60,24 @@ namespace Vezeeta.Web.Controllers.Admin
             return Ok(response);
         }
 
-        [HttpGet]
-        public ActionResult TopFiveSpecializations()
+        [HttpGet("Specialization/GetTopFive")]
+        public async Task<ActionResult<IEnumerable<TopSpecializationResponseDto>>> TopFiveSpecializations()
         {
-            return Ok("hello");
+            var specializations = await _doctorService.GetTopSpecialization(5);
+
+            var response = _mapper.Map<IEnumerable<TopSpecializationResponseDto>>(specializations);
+
+            return Ok(response);
         }
 
-        [HttpGet]
-        public ActionResult TopTenDoctors()
+        [HttpGet("Doctors/GetTopTen")]
+        public ActionResult<IEnumerable<TopDoctorsResponseDto>> TopTenDoctors()
         {
-            return Ok("hello");
+            var doctors = _doctorService.GetTopDoctors(10);
+
+            var response = _mapper.Map<IEnumerable<TopDoctorsResponseDto>>(doctors);
+
+            return Ok(response);
         }
     }
 }

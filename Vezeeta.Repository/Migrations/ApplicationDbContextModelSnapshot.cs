@@ -40,7 +40,10 @@ namespace Vezeeta.Repository.Migrations
 
                     b.HasIndex("DoctorId");
 
-                    b.ToTable("Appointments");
+                    b.HasIndex("Day", "DoctorId")
+                        .IsUnique();
+
+                    b.ToTable("Appointments", (string)null);
                 });
 
             modelBuilder.Entity("Vezeeta.Core.Domain.Appointments.AppointmentTime", b =>
@@ -57,14 +60,18 @@ namespace Vezeeta.Repository.Migrations
                     b.Property<bool>("Booked")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime>("Time")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("Time")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("AppointmentId");
 
-                    b.ToTable("AppointmentTimes");
+                    b.HasIndex("Time", "AppointmentId")
+                        .IsUnique();
+
+                    b.ToTable("AppointmentTimes", (string)null);
                 });
 
             modelBuilder.Entity("Vezeeta.Core.Domain.Bookings.Booking", b =>
@@ -81,9 +88,6 @@ namespace Vezeeta.Repository.Migrations
                     b.Property<int?>("CouponId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
-
                     b.Property<int>("DoctorId")
                         .HasColumnType("int");
 
@@ -92,6 +96,9 @@ namespace Vezeeta.Repository.Migrations
 
                     b.Property<int>("PatientId")
                         .HasColumnType("int");
+
+                    b.Property<float>("Price")
+                        .HasColumnType("real");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -106,7 +113,7 @@ namespace Vezeeta.Repository.Migrations
 
                     b.HasIndex("PatientId");
 
-                    b.ToTable("Bookings");
+                    b.ToTable("Bookings", (string)null);
                 });
 
             modelBuilder.Entity("Vezeeta.Core.Domain.Coupons.Coupon", b =>
@@ -135,7 +142,7 @@ namespace Vezeeta.Repository.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Coupons");
+                    b.ToTable("Coupons", (string)null);
                 });
 
             modelBuilder.Entity("Vezeeta.Core.Domain.Lookup.Specialization", b =>
@@ -156,7 +163,7 @@ namespace Vezeeta.Repository.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Specializations");
+                    b.ToTable("Specializations", (string)null);
 
                     b.HasData(
                         new
@@ -254,21 +261,21 @@ namespace Vezeeta.Repository.Migrations
                         new
                         {
                             Id = 1,
-                            ConcurrencyStamp = "f452bd0e-6ea7-4a65-8a76-1f1d3c897f8c",
+                            ConcurrencyStamp = "2cda0634-b474-42c6-8179-b6944fa6d7ec",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = 2,
-                            ConcurrencyStamp = "840bd598-5faa-4e5f-8b03-ec086406c2f2",
+                            ConcurrencyStamp = "985249c4-97ea-4460-9a90-0d3c869f6e30",
                             Name = "Doctor",
                             NormalizedName = "DOCTOR"
                         },
                         new
                         {
                             Id = 3,
-                            ConcurrencyStamp = "511bb021-420a-4a1b-a854-9590103b17b4",
+                            ConcurrencyStamp = "9c8557cf-04e7-413d-aca9-d2f834822b61",
                             Name = "Patient",
                             NormalizedName = "PATIENT"
                         });
@@ -470,7 +477,7 @@ namespace Vezeeta.Repository.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserRefreshTokens");
+                    b.ToTable("UserRefreshTokens", (string)null);
                 });
 
             modelBuilder.Entity("Vezeeta.Core.Domain.Users.UserRole", b =>
@@ -531,7 +538,7 @@ namespace Vezeeta.Repository.Migrations
 
             modelBuilder.Entity("Vezeeta.Core.Domain.Bookings.Booking", b =>
                 {
-                    b.HasOne("Vezeeta.Core.Domain.Appointments.AppointmentTime", "AppointmentTime")
+                    b.HasOne("Vezeeta.Core.Domain.Appointments.AppointmentTime", "Time")
                         .WithMany()
                         .HasForeignKey("AppointmentTimeId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -553,13 +560,13 @@ namespace Vezeeta.Repository.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("AppointmentTime");
-
                     b.Navigation("Coupon");
 
                     b.Navigation("Doctor");
 
                     b.Navigation("Patient");
+
+                    b.Navigation("Time");
                 });
 
             modelBuilder.Entity("Vezeeta.Core.Domain.Users.RoleClaim", b =>

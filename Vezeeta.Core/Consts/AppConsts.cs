@@ -32,13 +32,23 @@ namespace Vezeeta.Core.Consts
 
         public static class DomainModels
         {
-            public const string DoctorSpecialization = "Specialization";
+            public const string Specialization = "Specialization";
+            public const string DoctorSpecialization = "Doctor.Specialization";
+            public const string Appointment = "Appointment";
             public const string Appointments = "Appointments";
             public const string AppointmentTime = "Time";
             public const string AppointmentTimes = "Times";
             public const string AppointmentsAndTimes = "Appointments.Times";
+            public const string AppointmentDoctor = "Appointment.Doctor";
             public const string Patient = "Patient";
             public const string BookingAppointment = "Time.Appointment";
+            public const string Coupon = "Coupon";
+        }
+
+        public static class OrderBy
+        {
+            public const string Ascending = "ASC";
+            public const string Descending = "DESC";
         }
     }
 }

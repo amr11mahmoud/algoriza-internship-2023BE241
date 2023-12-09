@@ -29,7 +29,7 @@ namespace Vezeeta.Core.Domain.Users
         [ForeignKey("Specialization")]
         public int? SpecializationId { get; set; } = null;
         public string? ImageUrl { get; set; }
-        public float Price { get; set; }
+        public float Price { get; private set; }
         public virtual Specialization? Specialization { get; set; }
         public virtual IEnumerable<Appointment>? Appointments { get; set; }
 
@@ -51,6 +51,11 @@ namespace Vezeeta.Core.Domain.Users
             DateOfBirth = newData.DateOfBirth;
 
             if (!string.IsNullOrEmpty(newData.ImageUrl)) ImageUrl = newData.ImageUrl;
+        }
+
+        public void AddDoctorPrice(float price)
+        {
+            Price = price;
         }
     }
 }

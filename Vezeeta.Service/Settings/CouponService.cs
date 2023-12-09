@@ -1,32 +1,36 @@
-﻿using Vezeeta.Core.Domain.Coupons;
+﻿using Vezeeta.Core.Domain.Bookings;
+using Vezeeta.Core.Domain.Coupons;
+using Vezeeta.Core.Enums;
 using Vezeeta.Core.Repository;
+using Vezeeta.Core.Service.Bookings;
 using Vezeeta.Core.Service.Settings;
 using Vezeeta.Core.Shared;
+using Vezeeta.Repository.Repositories;
 
 namespace Vezeeta.Service.Settings
 {
     public class CouponService : ICouponService
     {
         private readonly IBaseRepository<Coupon> _couponRepository;
+        private readonly IBookingRepository _bookingRepository;
 
-        public CouponService(IBaseRepository<Coupon> couponRepository)
+        public CouponService(IBaseRepository<Coupon> couponRepository, IBookingRepository bookingRepository)
         {
             _couponRepository = couponRepository;
+            _bookingRepository = bookingRepository;
         }
 
-        public async Task<Result<IEnumerable<Coupon>>> GetAllCouponsAsync()
+        public async Task<IEnumerable<Coupon>> GetAllCouponsAsync()
         {
             IEnumerable<Coupon> coupons = await _couponRepository.GetAllAsync();
 
-            return Result.Success(coupons);
+            return coupons;
         }
 
-        public async Task<Result<Coupon>> GetCouponAsync(int id)
+        public async Task<Coupon?> GetCouponAsync(int id)
         {
             Coupon? coupon = await _couponRepository.GetByIdAsync(id);
-            if (coupon == null) return Result.Failure<Coupon>(Error.Errors.Settings.CouponNotFound());
-
-            return Result.Success(coupon);
+            return coupon;
         }
 
         public async Task<Result<bool>> AddCouponAsync(Coupon coupon)
@@ -74,6 +78,39 @@ namespace Vezeeta.Service.Settings
             await _couponRepository.SaveChangesAsync();
 
             return Result.Success(true);
-        }  
+        }
+
+        public async Task<Coupon?> GetCouponAsync(string code)
+        {
+            Coupon? coupon = await _couponRepository.FindAsync(c=> c.Code == code);
+            return coupon;
+        }
+
+        public async Task<Result<bool>> CouponIsActive(string code)
+        {
+            Coupon? coupon = await GetCouponAsync(code);
+            if (coupon == null) return Result.Failure<bool>(Error.Errors.Settings.CouponNotFound());
+
+            return Result.Success(coupon.Active);
+        }
+
+        public async Task<Result<bool>> CouponIsUsed(string code)
+        {
+            Coupon? coupon = await GetCouponAsync(code);
+            if (coupon == null) return Result.Failure<bool>(Error.Errors.Settings.CouponNotFound());
+
+            bool isUsed = await _bookingRepository.AnyAsync(booking=> booking.CouponId == coupon.Id && booking.Status != Core.Enums.RequestStatus.Canceled);
+
+            return Result.Success(isUsed);
+        }
+
+        public float CalculateFinalPrice(Coupon coupon, float price)
+        {
+            if (coupon.DiscountType == DiscountType.Value) return price - coupon.Value;
+
+            float discount = price * ((coupon.Value) / 100);
+
+            return price - discount;
+        }
     }
 }

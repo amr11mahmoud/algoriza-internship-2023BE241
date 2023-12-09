@@ -40,6 +40,16 @@
                     => new Error("patient.not.found", "patient not found!");
             }
 
+            public static class Bookings
+            {
+                public static Error BookingNotFound()
+                    => new Error("booking.not.found", "booking not found!");
+                public static Error BookingStatusIsNotPending()
+                    => new Error("invalid.booking.status", "booking status is not in pending status!");
+                public static Error InvalidBookingDoctor()
+                    => new Error("invalid.booking.doctor", "unauthorized request, invalid booking doctor!");
+            }
+
             public static class Users
             {
                 public static Error UserNotFound()
@@ -70,12 +80,46 @@
                     => new Error("user.already.in.role", $"user already in role [{role}]!");
             }
 
+            public static class Appointments
+            {
+                public static Error AppointmentNotFound()
+                   => new Error("appointment.not.found", $"appointment not found!");
+                public static Error AppointmentTimeNotFound()
+                   => new Error("appointment.time.not.found", $"appointment time not found!");
+                public static Error InvalidTimeFormat(string time)
+                       => new Error("invalid.time.format", $"{time} is invalid time format it should be hh:mm between 00:00 and 23:59 !", "Time");
+                public static Error InvalidDayFormat(string day)
+                       => new Error("invalid.day.format", $"{day} is invalid day format it should be day of week value like Saturday", "Day");
+                public static Error InvalidAppointmentDoctor()
+                    => new Error("invalid.appointment.doctor", "unauthorized request, invalid appointment doctor!");
+                public static Error AppointmentIsBooked()
+                   => new Error("appointment.is.booked", $"appointment is booked!");
+                public static Error AppointmentDayAlreadyExist(string day)
+                   => new Error("appointment.day.exist", $"appointment day [{day}] already exist, you can update it instead!");
+            }
             public static class Settings
             {
                 public static Error CouponCodeAlreadyExist(string code)
                        => new Error("coupon.code.exist", $"coupon with code [{code}] already exist!", "Code");
                 public static Error CouponNotFound()
                     => new Error("coupon.not.found", "coupon not found!");
+                public static Error CouponNotActive()
+                    => new Error("coupon.not.active", "coupon not active!");
+                public static Error CouponNotApplicable(int patientRequestsCount, int couponRequestsCount)
+                    => new Error("coupon.not.applicable", 
+                        $"you are not eligible to apply this coupon as it needs minimum {couponRequestsCount} " +
+                        $"number of requests and you have only {patientRequestsCount}!");
+                public static Error CouponAlreadyUsed()
+                    => new Error("coupon.already.used", "you already used this coupon before, and you can use coupon only once!");
+            }
+
+            public static class Exceptions
+            {
+                public static class Database
+                {
+                    public static Error DuplicateRecordException(string record)
+                      => new Error("duplicate.record.exception", $"a record already exist for [{record}]!", "N/A");
+                }
             }
         }
 

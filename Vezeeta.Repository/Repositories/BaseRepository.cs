@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using Vezeeta.Core.Repository;
+using static Vezeeta.Core.Consts.AppConsts;
 
 namespace Vezeeta.Repository.Repositories
 {
@@ -116,6 +117,39 @@ namespace Vezeeta.Repository.Repositories
             _context.Set<T>().Update(entity);
 
             return entity;
+        }
+
+        public async Task<IEnumerable<T>> AddRangeAsync(IEnumerable<T> entities)
+        {
+            await _context.Set<T>().AddRangeAsync(entities);
+            return entities;
+        }
+
+        public async Task<IEnumerable<T>> FindAllAsync(
+            Expression<Func<T, bool>>? match, 
+            int page, 
+            int pageSize, 
+            Expression<Func<T, object>> orderBy, 
+            string orderByDirection = "ASC")
+        {
+            IQueryable<T> query =  _context.Set<T>();
+
+            if (match != null)
+            {
+                query = query.Where(match);
+            }
+
+            if (page <= 0) page = 1;
+            if (pageSize <= 0) pageSize = 10;
+
+            if (orderByDirection == OrderBy.Ascending)
+                query = query.OrderBy(orderBy);
+            else
+                query = query.OrderByDescending(orderBy);
+
+            query = query.Skip(pageSize * (page - 1)).Take(pageSize);
+
+            return await query.ToListAsync();
         }
     }
 }

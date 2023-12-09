@@ -19,7 +19,7 @@ namespace Vezeeta.Service.Dtos.Response.Patients
         public string DoctorName { get; set; }
         public SpecializationDto Specialization { get; set; }
         public string Day { get; set; }
-        public DateTime Time { get; set; }
+        public string Time { get; set; }
         public float Price { get; set; }
         public float FinalPrice { get; set; }
         public string DiscountCode { get; set; }

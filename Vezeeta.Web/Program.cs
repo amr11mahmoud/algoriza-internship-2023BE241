@@ -1,19 +1,26 @@
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
+using System.Globalization;
 using System.Text;
 using Vezeeta.Core.Domain.Users;
 using Vezeeta.Core.Repository;
+using Vezeeta.Core.Service;
+using Vezeeta.Core.Service.Appointments;
 using Vezeeta.Core.Service.Bookings;
 using Vezeeta.Core.Service.Settings;
 using Vezeeta.Core.Service.Users;
 using Vezeeta.Repository;
 using Vezeeta.Repository.Repositories;
+using Vezeeta.Service.Appointments;
 using Vezeeta.Service.Bookings;
+using Vezeeta.Service.Mail;
 using Vezeeta.Service.Settings;
 using Vezeeta.Service.Users;
 using Vezeeta.Web.Helpers;
@@ -22,7 +29,7 @@ namespace Vezeeta.Web
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
             var configuration = builder.Configuration;
@@ -35,6 +42,20 @@ namespace Vezeeta.Web
 
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
+
+            builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+            builder.Services.Configure<RequestLocalizationOptions>(options =>
+            {
+                var supportedCultures = new List<CultureInfo>
+                {
+                    new CultureInfo("en-US"),
+                    new CultureInfo("ar")
+                };
+
+                options.DefaultRequestCulture = new RequestCulture("en-US");
+                options.SupportedCultures = supportedCultures;
+                options.SupportedUICultures = supportedCultures;
+            });
 
             builder.Services.AddSwaggerGen(opt =>
             {
@@ -107,6 +128,16 @@ namespace Vezeeta.Web
                 };
             });
 
+            builder.Services.AddAuthentication(opt =>
+            {
+                opt.DefaultAuthenticateScheme = GoogleDefaults.AuthenticationScheme;
+                opt.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+            }).AddGoogle(googleOptions =>
+            {
+                googleOptions.ClientId = configuration["Authentication:Google:ClientId"];
+                googleOptions.ClientSecret = configuration["Authentication:Google:ClientSecret"];
+            });
+
             builder.Services.AddAutoMapper(typeof(MapperConfig));
 
             builder.Services.AddTransient(typeof(IBaseRepository<>), typeof(BaseRepository<>));
@@ -116,14 +147,23 @@ namespace Vezeeta.Web
 
             builder.Services.AddTransient(typeof(IUserService), typeof(UserService));
             builder.Services.AddTransient(typeof(IDoctorService), typeof(DoctorService));
+            builder.Services.AddTransient(typeof(IAppointmentService), typeof(AppointmentService));
             builder.Services.AddTransient(typeof(IPatientService), typeof(PatientService));
             builder.Services.AddTransient(typeof(IBookingService), typeof(BookingService));
             builder.Services.AddTransient(typeof(ICouponService), typeof(CouponService));
+            builder.Services.AddTransient(typeof(IMailService), typeof(MailService));
 
             builder.Services.AddTransient(typeof(IImageHelper), typeof(ImageHelper));
 
 
             var app = builder.Build();
+
+            using (var scope = app.Services.CreateScope())
+            {
+                var userManager = (UserManager<User>)scope.ServiceProvider.GetService(typeof(UserManager<User>));
+
+                await ApplicationDbInitializer.SeedAdmin(userManager);
+            }
 
             app.UseSerilogRequestLogging();
 
@@ -142,9 +182,18 @@ namespace Vezeeta.Web
                 app.UseExceptionHandler();
             }
 
+
+
             app.UseHttpsRedirection();
             app.UseRouting();
 
+            var supportedCultures = new[] { "en-US", "ar" };
+            var localizationOptions =
+                new RequestLocalizationOptions().SetDefaultCulture(supportedCultures[0])
+                .AddSupportedCultures(supportedCultures)
+                .AddSupportedUICultures(supportedCultures);
+
+            app.UseRequestLocalization(localizationOptions);
             app.UseAuthentication();
             app.UseAuthorization();
 
