@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Vezeeta.Core.Consts;
 using Vezeeta.Core.Domain.Users;
 
 namespace Vezeeta.Repository
@@ -13,7 +14,7 @@ namespace Vezeeta.Repository
     {
         public static async Task<bool> SeedAdmin(UserManager<User> userManager)
         {
-            var admin = await userManager.FindByEmailAsync("admin@test.com");
+            var admin = await userManager.FindByEmailAsync(AppConsts.User.AdminEmail);
             if (admin == null)
             {
                 User user = new User
@@ -22,7 +23,7 @@ namespace Vezeeta.Repository
                     Email = "admin@test.com",
                 };
 
-                IdentityResult result = await userManager.CreateAsync(user, "V44{aaw%/A");
+                IdentityResult result = await userManager.CreateAsync(user, AppConsts.User.AdminPassword);
 
                 if (result.Succeeded)
                 {

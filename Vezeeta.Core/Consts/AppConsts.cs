@@ -21,6 +21,8 @@ namespace Vezeeta.Core.Consts
             public const double TokenExpiryDays = 7;
             public const double RefreshTokenExpiryDays = 30;
             public const string DoctorBasePassword = "[%tw459r";
+            public const string AdminPassword = "V44{aaw%/A";
+            public const string AdminEmail = "admin@test.com";
         }
 
         public static class Roles
