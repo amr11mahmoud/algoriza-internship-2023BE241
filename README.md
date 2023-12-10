@@ -23,4 +23,4 @@ Documentation notes:
 - Input Day format (Saturday - Sunday ... etc)
 - Input Gender format (Male = Female)
 - Mail service is working it just need API-KEY from sendGrid and email to send from
-- 
+- Social login (Google) is not fully implemented, there is no logic implemented for callback, redirect, token retrieval and user creation for external login
