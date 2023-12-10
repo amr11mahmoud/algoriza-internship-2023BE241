@@ -20,3 +20,7 @@ Documentation notes:
 - Mapper configuration including member mapping in MapperConfig file
 - Appconst DomainModels is used when passing includes to repository methods
 - Date seed for roles and specialization in DbContext onModelCreating, and admin seed in a static class (ApplicationDbInitializer) called once when app startup
+- Input Day format (Saturday - Sunday ... etc)
+- Input Gender format (Male = Female)
+- Mail service is working it just need API-KEY from sendGrid and email to send from
+- 
