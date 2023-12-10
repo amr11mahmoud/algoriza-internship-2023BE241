@@ -23,7 +23,7 @@ namespace Vezeeta.Service.Mail
 
             var msg = new SendGridMessage()
             {
-                From = new EmailAddress("amrmahmoudfcb11@gmail.com", "Vezeeta"),
+                From = new EmailAddress("---your send grid email here---", "Vezeeta"),
                 Subject = subject,
                 PlainTextContent = text,
                 HtmlContent = text.Replace("\n", "<br>")
