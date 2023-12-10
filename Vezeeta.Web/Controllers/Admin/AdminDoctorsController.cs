@@ -8,6 +8,7 @@ using Vezeeta.Core.Service.Users;
 using Vezeeta.Core.Shared;
 using Vezeeta.Service.Dtos.Request.Doctors;
 using Vezeeta.Service.Dtos.Response.Doctors;
+using Vezeeta.Service.Helpers;
 using Vezeeta.Web.Helpers;
 
 namespace Vezeeta.Web.Controllers.Admin
@@ -42,6 +43,8 @@ namespace Vezeeta.Web.Controllers.Admin
         public async Task<ActionResult<GetDoctorDto>> GetById(int id)
         {
             var doctor = await _doctorService.GetDoctorAsync(id, new[] { AppConsts.DomainModels.Specialization });
+            if (doctor == null) return BadRequest(Error.Errors.Doctors.DoctorNotFound());
+
             var response = _mapper.Map<GetDoctorDto>(doctor);
 
             return Ok(response);
@@ -50,6 +53,8 @@ namespace Vezeeta.Web.Controllers.Admin
         [HttpPost]
         public async Task<ActionResult<bool>> Add([FromForm] AddDoctorDto request)
         {
+            if (!UserHelper.CanConvertStringToGender(request.Gender)) return BadRequest(Error.Errors.Users.InvalidGenderFormat());
+
             User user = _mapper.Map<User>(request);
 
             Result<string> uploadImageResult = _imageHelper.UploadImage(request.Image);
@@ -69,6 +74,8 @@ namespace Vezeeta.Web.Controllers.Admin
         [HttpPut]
         public async Task<ActionResult<bool>> Edit([FromForm] EditDoctorDto request)
         {
+            if (!UserHelper.CanConvertStringToGender(request.Gender)) return BadRequest(Error.Errors.Users.InvalidGenderFormat());
+
             User user = _mapper.Map<User>(request);
 
             if (request.Image != null)

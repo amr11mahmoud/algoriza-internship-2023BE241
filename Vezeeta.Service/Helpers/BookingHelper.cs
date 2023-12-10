@@ -43,6 +43,7 @@ namespace Vezeeta.Service.Helpers
             {
                 var bookingDto = new GetPatientBookingDto
                 {
+                    Id = booking.Id,
                     Status = booking.Status.ToString(),
                     ImageUrl = booking.Doctor.ImageUrl,
                     DoctorName = booking.Doctor.FullName,

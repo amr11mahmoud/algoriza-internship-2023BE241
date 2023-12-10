@@ -24,6 +24,7 @@ using Vezeeta.Service.Mail;
 using Vezeeta.Service.Settings;
 using Vezeeta.Service.Users;
 using Vezeeta.Web.Helpers;
+using Vezeeta.Web.Mapper;
 
 namespace Vezeeta.Web
 {
@@ -183,7 +184,7 @@ namespace Vezeeta.Web
             }
 
 
-
+            app.UseStaticFiles();
             app.UseHttpsRedirection();
             app.UseRouting();
 

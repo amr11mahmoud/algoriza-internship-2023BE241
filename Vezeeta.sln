@@ -3,15 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.33516.290
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vezeeta.Web", "Vezeeta.Web\Vezeeta.Web.csproj", "{4193B1AD-9C2F-4094-8E6D-6EDCACC62F7F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vezeeta.Web", "Vezeeta.Web\Vezeeta.Web.csproj", "{4193B1AD-9C2F-4094-8E6D-6EDCACC62F7F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vezeeta.Repository", "Vezeeta.Repository\Vezeeta.Repository.csproj", "{8344A4D5-9892-454A-A85F-1F2384B1C1CC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vezeeta.Repository", "Vezeeta.Repository\Vezeeta.Repository.csproj", "{8344A4D5-9892-454A-A85F-1F2384B1C1CC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vezeeta.Core", "Vezeeta.Core\Vezeeta.Core.csproj", "{FB1BA0A0-5BA9-4BE8-87BC-C4F820AD2B66}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vezeeta.Core", "Vezeeta.Core\Vezeeta.Core.csproj", "{FB1BA0A0-5BA9-4BE8-87BC-C4F820AD2B66}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vezeeta.Service", "Vezeeta.Service\Vezeeta.Service.csproj", "{26084534-0439-44BE-BC2E-5DC25F8176C5}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vezeeta.DependancyInjection", "Vezeeta.DependancyInjection\Vezeeta.DependancyInjection.csproj", "{2F8D2F9A-4C62-4721-8171-C14B1D39ACD9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vezeeta.Service", "Vezeeta.Service\Vezeeta.Service.csproj", "{26084534-0439-44BE-BC2E-5DC25F8176C5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,10 +33,6 @@ Global
 		{26084534-0439-44BE-BC2E-5DC25F8176C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{26084534-0439-44BE-BC2E-5DC25F8176C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{26084534-0439-44BE-BC2E-5DC25F8176C5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2F8D2F9A-4C62-4721-8171-C14B1D39ACD9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2F8D2F9A-4C62-4721-8171-C14B1D39ACD9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2F8D2F9A-4C62-4721-8171-C14B1D39ACD9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2F8D2F9A-4C62-4721-8171-C14B1D39ACD9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

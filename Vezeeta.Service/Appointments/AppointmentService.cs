@@ -34,9 +34,10 @@ namespace Vezeeta.Service.Appointments
             return appointments;
         }
 
-        public async Task<Appointment?> GetAppointmentAsync(int appointmentId, string[]? includes = null)
+        public async Task<Appointment?> GetAppointmentAsync(int appointmentId, int doctorId, string[]? includes = null)
         {
-            Appointment? appointment = await _appointmentRepository.FindAsync(appointment => appointment.Id == appointmentId, includes);
+            Appointment? appointment = 
+                await _appointmentRepository.FindAsync(appointment => appointment.Id == appointmentId && appointment.DoctorId == doctorId, includes);
             return appointment;
         }
 

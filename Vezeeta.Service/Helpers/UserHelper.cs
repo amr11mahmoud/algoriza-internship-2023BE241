@@ -1,4 +1,7 @@
-﻿namespace Vezeeta.Service.Helpers
+﻿using System.Globalization;
+using Vezeeta.Core.Enums;
+
+namespace Vezeeta.Service.Helpers
 {
     public static class UserHelper
     {
@@ -11,6 +14,13 @@
             if (birthDate.Date > today.AddYears(-age)) age--;
 
             return age;
+        }
+
+        public static bool CanConvertStringToGender(string genderString)
+        {
+            Gender gender;
+
+            return Enum.TryParse(genderString, out gender);
         }
     }
 }

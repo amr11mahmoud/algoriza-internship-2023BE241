@@ -64,6 +64,8 @@
                     => new Error(code, msg);
                 public static Error InvalidPassword()
                     => new Error("incorrect.password", "password is incorrect", "password");
+                public static Error InvalidGenderFormat()
+                    => new Error("invalid.gender.input", "gender should be either Male or Female", "gender");
                 public static Error InvalidJwtToken()
                     => new Error("invalid.jwt.token", "invalid jwt token!");
                 public static Error UserCanNotSignIn()

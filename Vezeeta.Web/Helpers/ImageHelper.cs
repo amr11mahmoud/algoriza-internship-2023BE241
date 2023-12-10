@@ -1,10 +1,12 @@
-﻿using Vezeeta.Core.Shared;
+﻿using System.Security.Policy;
+using Vezeeta.Core.Shared;
 
 namespace Vezeeta.Web.Helpers
 {
     public interface IImageHelper
     {
         Result<string> UploadImage(IFormFile? image);
+        string GetImagePath(string imageName);
     }
 
     public class ImageHelper: IImageHelper
@@ -33,9 +35,18 @@ namespace Vezeeta.Web.Helpers
             return Result.Success(string.Empty);
         }
 
+        public string GetImagePath(string imageName)
+        {
+            var url = "https://localhost:7239/";
+            string imagePath = Path.Combine(url, $"images/{imageName}");
+
+            return imagePath;
+        }
+
         public static bool HasImageExtension(IFormFile image)
         {
             return (image.FileName.EndsWith(".png") || image.FileName.EndsWith(".jpg"));
         }
+
     }
 }

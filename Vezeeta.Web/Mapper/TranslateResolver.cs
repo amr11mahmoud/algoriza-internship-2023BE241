@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Localization;
+using Vezeeta.Web.Helpers;
 
-namespace Vezeeta.Web.Localization
+namespace Vezeeta.Web.Mapper
 {
     public class TranslateResolver : IMemberValueResolver<object, object, string, string>
     {

@@ -9,6 +9,7 @@ namespace Vezeeta.Service.Dtos.Response.Patients
 {
     public class GetPatientBookingDto
     {
+        public int Id { get; set; }
         public string DoctorName { get; set; }
         public string ImageUrl { get; set; }
         public string? DiscountCode { get; set; }

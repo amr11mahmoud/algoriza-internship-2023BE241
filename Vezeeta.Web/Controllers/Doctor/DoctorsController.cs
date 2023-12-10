@@ -7,7 +7,6 @@ using Vezeeta.Core.Domain.Bookings;
 using Vezeeta.Core.Enums;
 using Vezeeta.Core.Service.Appointments;
 using Vezeeta.Core.Service.Bookings;
-using Vezeeta.Core.Service.Users;
 using Vezeeta.Core.Shared;
 using Vezeeta.Service.Dtos.Request.Appointments;
 using Vezeeta.Service.Dtos.Request.Doctors;
@@ -69,10 +68,12 @@ namespace Vezeeta.Web.Controllers.Doctor
             return Ok(true);
         }
 
-        [HttpPost("Appointments/Get")]
+        [HttpGet("Appointments/Get")]
         public async Task<ActionResult<GetAppointmentDto>> GetAppointment(int id)
         {
-            Appointment? appointment = await _appointmentService.GetAppointmentAsync(id, new[] { DomainModels.AppointmentTimes });
+            int doctorId = GetUserId();
+
+            Appointment? appointment = await _appointmentService.GetAppointmentAsync(id, doctorId, new[] { DomainModels.AppointmentTimes });
 
             if (appointment == null) return BadRequest(Error.Errors.Appointments.AppointmentNotFound());
 
@@ -81,7 +82,7 @@ namespace Vezeeta.Web.Controllers.Doctor
             return Ok(response);
         }
 
-        [HttpPost("Appointments/GetAll")]
+        [HttpGet("Appointments/GetAll")]
         public async Task<ActionResult<GetAppointmentDto>> GetAllAppointments()
         {
             int doctorId = GetUserId();

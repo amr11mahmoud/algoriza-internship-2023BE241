@@ -13,9 +13,8 @@ using Vezeeta.Service.Dtos.Response.Appointments;
 using Vezeeta.Service.Dtos.Response.Coupons;
 using Vezeeta.Service.Dtos.Response.Doctors;
 using Vezeeta.Service.Dtos.Response.Patients;
-using Vezeeta.Web.Localization;
 
-namespace Vezeeta.Web
+namespace Vezeeta.Web.Mapper
 {
     public class MapperConfig : Profile
     {
@@ -23,7 +22,8 @@ namespace Vezeeta.Web
         {
             CreateMap<User, GetDoctorDto>()
             .ForMember(dest => dest.Gender, opt => opt
-            .MapFrom<TranslateResolver, string>(src => src.Gender.ToString()));
+            .MapFrom<TranslateResolver, string>(src => src.Gender.ToString()))
+            .ForMember(dest => dest.ImageUrl, opt => opt.MapFrom<ImageUrlResolver, string>(src => src.ImageUrl));
 
             CreateMap<Specialization, SpecializationDto>()
                 .ForMember(dest => dest.Name, opt => opt
@@ -31,7 +31,8 @@ namespace Vezeeta.Web
 
             CreateMap<User, GetPatientDto>()
             .ForMember(dest => dest.Gender, opt => opt
-            .MapFrom<TranslateResolver, string>(src => src.Gender.ToString()));
+            .MapFrom<TranslateResolver, string>(src => src.Gender.ToString()))
+            .ForMember(dest => dest.ImageUrl, opt => opt.MapFrom<ImageUrlResolver, string>(src => src.ImageUrl));
 
             CreateMap<Appointment, GetAppointmentDto>()
             .ForMember(dest => dest.Day, opt => opt
@@ -44,6 +45,11 @@ namespace Vezeeta.Web
             CreateMap<DoctorRequestCount, TopDoctorsResponseDto>()
             .ForMember(dest => dest.Specialization, opt => opt
             .MapFrom<TranslateResolver, string>(src => src.Specialization));
+
+            CreateMap<User, GetDoctorWithAppointmentsDto>()
+            .ForMember(dest => dest.Gender, opt => opt
+            .MapFrom<TranslateResolver, string>(src => src.Gender.ToString()))
+            .ForMember(dest => dest.ImageUrl, opt => opt.MapFrom<ImageUrlResolver, string>(src => src.ImageUrl));
 
             CreateMap<User, AddDoctorDto>().ReverseMap();
             CreateMap<User, EditDoctorDto>().ReverseMap();
