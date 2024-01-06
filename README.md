@@ -1,4 +1,4 @@
-# algoriza-internship-241
+# doctor appointments management
 admin: admin@test.com
 password: V44{aaw%/A
 doctor-password: [%tw459r
